@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
+const Mongoose = require("mongoose");
+
 
 
 const validateRegisterInput = require("../../validation/register");
@@ -27,6 +29,7 @@ router.post("/register", (req, res) => {
       return res.status(400).json({ regNo: "Email already exists" });
     } else {
       const newUser = new User({
+        _id:new Mongoose.Types.ObjectId(),
         name: req.body.name,
         email: req.body.email,
         password: req.body.password,
@@ -74,12 +77,8 @@ router.post("/login", (req, res) => {
         // User matched
         // Create JWT Payload
         const payload = {
-          id: user.id,
+          _id: user._id,
           name: user.name,
-          regNo: user.regNo,
-          clubCode: user.clubCode,
-          testId: user.testId,
-          mobileNo: user.mobileNo,
           email: user.email,
         };
 

@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
+const Mongoose = require('mongoose');
+
 
 const validateOrgRegister = require('../../validation/org/register');
 const validateOrgLogin = require('../../validation/org/login');
@@ -19,6 +21,7 @@ router.post('/register', (req, res) => {
             return res.status(400).json({ email: "Organisation email already exists" })
         } else {
             const newOrg = new Org({
+                _id:new Mongoose.Types.ObjectId(),
                 teacherName: req.body.teacherName,
                 email: req.body.email,
                 password: req.body.password
@@ -57,6 +60,7 @@ router.post('/login', (req, res) => {
                 // Create JWT Payload
                 const payload = {
                     teacherName: org.teacherName,
+                    email: org.email
                 };
 
                 // Sign token

@@ -8,14 +8,20 @@ const userScoreSchema = new Schema({
 })
 
 const orgTestsSchema = new Schema({
-    testId: String,
-    teacherId: String,
+    testId: {
+        type:String,
+        required:true
+    },
+    teacherId: {
+        type:String,
+        required:true
+    },
     start: Boolean,
     usersScores: [userScoreSchema]
 })
 
 const orgSchema = new Schema({
-    teacherId: Mongoose.Schema.Types.ObjectId,
+    _id: Mongoose.Schema.Types.ObjectId,
     teacherName: {
         type: String,
         required: true,

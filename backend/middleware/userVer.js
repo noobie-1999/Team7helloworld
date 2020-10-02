@@ -10,20 +10,8 @@ function verify(req, res, next) {
     jwt.verify(req.body.token, secretkey, (err, data) => {
         if (err) {
             next(err);
-        } else {
-            if (data.email != req.body.email) next({ err: "Token Invalid" })
-            else User.findOne({ regNo: data.email }, (err, result) => {
-                if (err) next(err)
-                else {
-                    if (result == null) next({ err: "No such user exists" })
-                    else {
-                        next();
-                    }
-                }
-
-            })
-
         }
+        else next()
     })
 }
 

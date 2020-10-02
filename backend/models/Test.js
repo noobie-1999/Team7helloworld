@@ -11,11 +11,11 @@ const questionSchema = new Schema({
 })
 
 const testSchema = new Schema({
+    _id: Mongoose.Schema.Types.ObjectId,
     testName: {
         type: String,
         required: true
     },
-    testId: Mongoose.Schema.Types.ObjectId,
     MaxMarks: Number,
     perQuestionMarks: Number,
     negativeMarks: Number,

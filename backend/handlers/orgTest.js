@@ -1,5 +1,4 @@
 // here posts of questions and test schemas will be handled
-// const tests = require('../../models/tests')
 const Mongoose = require('mongoose');
 const Test = require('../models/Test').Test
 const Question = require('../models/Test').Question
@@ -9,70 +8,54 @@ function addTest(req, res, next) {
     // check if test name already exits
 
     var test = new Test({
-        testId: new Mongoose.Types.ObjectId(),
+        _id: new Mongoose.Types.ObjectId(),
         testName: req.body.testName,
         MaxMarks: req.body.maxMarks,
-        perQuestionMarks:req.body.perQuestionMarks,
+        perQuestionMarks: req.body.perQuestionMarks,
         negativeMarks: req.body.negativeMarks,
         questions: req.body.questions,
 
     })
 
     var OrgTest = new OrgTests({
-        testId: test.testId,
+        testId: test._id,
         teacherId: req.params.teacherId,
         start: false,
         userScores: []
     })
 
-    Promise.all([OrgTest.save(),test.save()])
-        .then((result) => { res.send(test) })
-        .catch((err) => next(err))
-    
+    Test.findOne({ testName: test.testName }, (err, result) => {
+        if (err) next(err)
+        else {
+            if (!result) {
 
-    // if (req.body.testId) {
-    //     Test.findOne({ testId: req.body.testId }, (err, result) => {
-    //         if (err) next(err)
-    //         else {
+                Promise.all([OrgTest.save(), test.save()])
+                    .then((result) => { res.send(test) })
+                    .catch((err) => next(err))
 
-    //             if (result == null) {
+            }
+            else {
+                res.status(409).json({
+                    err: "test with given name already exists"
+                })
+            }
+        }
+    })
 
-    //                 // create the test
-    //                 var OrgTest = new OrgTests({testId:req.body.testId,clubCode:req.body.clubCode,start:false,userScores:[]})
-    //                 var test = new Test({ testId: req.body.testId, clubCode: req.body.clubCode })
-    //                     Promise.all([OrgTest.save(),test.save()])
-    //                     .then((result) => { res.send(test) })
-    //                     .catch((err) => next(err))
-    //             }
-    //             else {
-    //                 if (result == null)
-    //                     next({ err: 'No such test ID exists' })
-    //                 else {
-    //                     req.body.questions.forEach((val) => {
-    //                         req.body.questions.forEach((val) => {
-    //                             result.questions.addToSet(new Question(val))
-                                
-    //                         })
-    //                     })
-    //                 }
-    //             }
-    //         }
-    //     })
-    // }
-    // else next({ err: "no test id provided " })
+
+
 }
 
 function addQuestion(req, res, next) {
-    if (!req.params.id) next("Question content can not be empty")
     if (req.body.testId) {
         //check if test exists
-        Test.findOne({ testId: req.body.testId }, (err, result) => {
+        Test.findOne({ _id: req.body.testId }, (err, result) => {
             if (err) next(err)
             else {
                 if (result == null) next("no such test id exists")
                 else {
 
-                    const value = { ...(req.body.question), _id: req.params.id }
+                    const value = { ...(req.body.question), _id: result.questions.length +1 }
                     result.questions.addToSet(new Question(value))
                     result.save((err, result) => {
                         if (err) next(err)
@@ -89,7 +72,7 @@ function addQuestion(req, res, next) {
 function modifyQuestion(req, res, next) {
     if (!req.params.id) next("Question content can not be empty")
     if (!req.body.testId) next("Test id is req");
-    Test.findOne({ testId: req.body.testId }, (err, result) => {
+    Test.findOne({ _id: req.body.testId }, (err, result) => {
         if (err) next(err)
         else {
             if (result == null) next("no such test id exists")
@@ -122,7 +105,7 @@ function modifyQuestion(req, res, next) {
 function deleteQuestion(req, res, next) {
     if (!req.params.id) next("Question id cant be empty")
     else {
-        Test.findOne({ testId: req.body.testId }, (err, result) => {
+        Test.findOne({ _id: req.body.testId }, (err, result) => {
             if (err) next(err)
             else {
                 if (!result) next("test with given testid is not found")
@@ -142,25 +125,24 @@ function deleteQuestion(req, res, next) {
 }
 function viewQuestions(req, res, next) {
 
-    Test.findOne({ teacherId: req.params.teacherId,testId: req.params.testId }, (err, result) => {
+    Test.findOne({ _id: req.params._id }, (err, result) => {
         if (err) next(err)
         else {
             if (!result) next("no such test exists")
             else {
-                res.send(result.questions)
+                res.send(result)
             }
         }
     })
-
 }
 
 
 function checkResult(req, res, next) {
     if (req.body.testId == null) next("test id is null")
     else {
-        OrgTests.findOne({ testId: req.body.testId, clubCode: req.body.clubCode }, (err, result) => {
+        OrgTests.findOne({ testId: req.body.testId, teacherId: req.body.teacherId }, (err, result) => {
             if (err) next(err)
-            else if (result == null) next("no such test or club code exists")
+            else if (result == null) next("no such test exists")
             else {
                 res.send(result.usersScores)
             }
@@ -168,10 +150,6 @@ function checkResult(req, res, next) {
     }
 }
 
-
-
-
-
 module.exports = [
-    addTest, addQuestion,checkResult,deleteQuestion,modifyQuestion,viewQuestions
+    addTest, addQuestion, checkResult, deleteQuestion, modifyQuestion, viewQuestions
 ]

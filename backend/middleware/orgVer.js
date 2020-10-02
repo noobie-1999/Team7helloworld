@@ -11,23 +11,7 @@ function verify(req, res, next) {
         if (err) {
             next(err);
         }
-        else {
-            // check if the token club and give club are same
-            // data will be there
-            // check if club exists or not
-
-            Org.find({ email: data.email}, (err, result) => {
-                if (err) next(err);
-
-                if (result == null) next({ err: "Invalid email" })
-                else {
-
-                    if (req.body.email != data.email) next({ err: "Email doesn't exists" })
-                    // if club exists then its fine proceed
-                    else next();
-                }
-            })
-        }
+        else next()
     })
 
 }

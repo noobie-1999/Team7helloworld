@@ -2,13 +2,14 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const userTestScoreSchema = new Schema({
-  testId: Number,
+  testId: String,
   score: Number,
   attempted: Boolean
 })
 
 // Create User Schema
 const UserSchema = new Schema({
+  _id: mongoose.Schema.Types.ObjectId,
   name: {
     type: String,
     required: true
