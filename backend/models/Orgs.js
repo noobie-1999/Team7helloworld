@@ -1,0 +1,40 @@
+const Mongoose = require('mongoose');
+const Schema = Mongoose.Schema;
+
+const userScoreSchema = new Schema({
+    name: String,
+    email: String,
+    marks: Number,
+})
+
+const orgTestsSchema = new Schema({
+    testId: String,
+    teacherId: String,
+    start: Boolean,
+    usersScores: [userScoreSchema]
+})
+
+const orgSchema = new Schema({
+    teacherId: Mongoose.Schema.Types.ObjectId,
+    teacherName: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required:true
+    },
+    password: {
+        type: String,
+        required:true
+    }
+})
+
+
+const Org = Mongoose.model("Org", orgSchema);
+const userScore = Mongoose.model('userScore', userScoreSchema)
+const orgTests = Mongoose.model('orgTests', orgTestsSchema);
+
+module.exports = {
+    Org,userScore,orgTests
+}
