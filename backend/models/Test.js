@@ -16,7 +16,7 @@ const testSchema = new Schema({
         type: String,
         required: true
     },
-    MaxMarks: Number,
+    maxMarks: Number,
     perQuestionMarks: Number,
     negativeMarks: Number,
     questions: [questionSchema],

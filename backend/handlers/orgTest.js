@@ -3,14 +3,70 @@ const Mongoose = require('mongoose');
 const Test = require('../models/Test').Test
 const Question = require('../models/Test').Question
 const OrgTests = require('../models/Orgs').orgTests
+const formidable = require('formidable');
+const fs = require('fs')
+const axios = require('axios');
 
 function addTest(req, res, next) {
     // check if test name already exits
 
+    // const form = formidable({ multiples: true });
+
+    // form.parse(req, (err, fields, files) => {
+  
+    //     fileTxt = fs.readFileSync(files.multipleFiles.path).toString()
+
+    //     axios.post('/ujjwal bhaiya ka route', {
+    //         fileTxt: fileTxt
+    //       })
+    //       .then(function (response) {
+    //         console.log(response);
+
+    //         // i have to replace this req.body with response
+
+    //         var test = new Test({
+    //             _id: new Mongoose.Types.ObjectId(),
+    //             testName: req.body.testName,
+    //             maxMarks: req.body.maxMarks,
+    //             perQuestionMarks: req.body.perQuestionMarks,
+    //             negativeMarks: req.body.negativeMarks,
+    //             questions: req.body.questions,
+        
+    //         })
+        
+    //         var OrgTest = new OrgTests({
+    //             testId: test._id,
+    //             teacherId: req.params.teacherId,
+    //             userScores: []
+    //         })
+        
+    //         Test.findOne({ testName: test.testName }, (err, result) => {
+    //             if (err) next(err)
+    //             else {
+    //                 if (!result) {
+        
+    //                     Promise.all([OrgTest.save(), test.save()])
+    //                         .then((result) => { res.send(test) })
+    //                         .catch((err) => next(err))
+        
+    //                 }
+    //                 else {
+    //                     res.status(409).json({
+    //                         err: "test with given name already exists"
+    //                     })
+    //                 }
+    //             }
+    //         })
+    //       })
+    //       .catch(function (error) {
+    //         console.log(error);
+    //       });
+    // });
+
     var test = new Test({
         _id: new Mongoose.Types.ObjectId(),
         testName: req.body.testName,
-        MaxMarks: req.body.maxMarks,
+        maxMarks: req.body.maxMarks,
         perQuestionMarks: req.body.perQuestionMarks,
         negativeMarks: req.body.negativeMarks,
         questions: req.body.questions,
@@ -20,7 +76,6 @@ function addTest(req, res, next) {
     var OrgTest = new OrgTests({
         testId: test._id,
         teacherId: req.params.teacherId,
-        start: false,
         userScores: []
     })
 
@@ -41,8 +96,6 @@ function addTest(req, res, next) {
             }
         }
     })
-
-
 
 }
 
@@ -150,6 +203,38 @@ function checkResult(req, res, next) {
     }
 }
 
+function viewStudentResult(req, res, next) {
+    if (req.body.testId && req.body.studentEmail) {
+
+        orgTests.findOne({ testId: req.body.testId}, (err, result) => {
+            if (err) next(err)
+            else if (result == null) {
+                next("No such test exists (source: Org)")
+            }
+            else{
+
+                f=0
+
+                for (let i = 0; i < result.usersScores.length; i++) {
+                    
+                    if(result.usersScores[i].email== req.body.studentEmail){
+
+                        res.send(result.usersScores[i])
+                        f=1
+                        break
+                    }
+                }
+
+                if(!f){
+                    next('No such user exists')
+                }
+
+            }
+        })
+    }
+    else next("Test id or student id is not present")
+}
+
 module.exports = [
-    addTest, addQuestion, checkResult, deleteQuestion, modifyQuestion, viewQuestions
+    addTest, addQuestion, checkResult, deleteQuestion, modifyQuestion, viewQuestions,viewStudentResult
 ]

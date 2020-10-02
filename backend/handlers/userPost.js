@@ -14,24 +14,25 @@ function takeTest(req, res, next) {
                     result.questions.forEach((question) => {
                         var q = {
                             quid: question._id,
-                            ques: question.ques,
+                            ques: question.question,
                             options: question.options
                         }
                         questionSet.push(q)
                     })
-                    var data = { questionSet, testId: result.testId, clubCode: result.clubCode }
+                    var data = { questionSet, testId: result._id}
                     res.send(data)
                 }
             }
         })
     }
-    else next("Test id or club code is not present")
+    else next("Test id is not present")
 }
+
 function submitTest(req, res, next) {
     // passing all the validation
 
     if (req.body.testId == null) next("testId not given")
-    Test.findOne({ testId: req.body.testId }, (err, result) => {
+    Test.findOne({ _id: req.body.testId }, (err, result) => {
         if (err) next(err)
         else if (result == null) next("no such test exists (source Test)")
         else {
@@ -40,9 +41,9 @@ function submitTest(req, res, next) {
             let totalMarks = 0;
             let match = new Map()
             result.questions.forEach((value) => {
-                match.set(value._id, value.ans)
-
+                match.set(value._id, value.correct)
             })
+
             // itertate through object array and 
             //get the current score
             req.body.ans.forEach((value) => {
@@ -51,6 +52,7 @@ function submitTest(req, res, next) {
                 console.log(value)
                 console.log(value._id)
                 console.log(value.ans)
+                console.log(correctAns)
                 // add marks if correct 
                 if (correctAns != null && correctAns == value.ans) {
                     totalMarks++
@@ -66,19 +68,46 @@ function submitTest(req, res, next) {
                 }
                 else {
                     // add user 
-                    let newUser = userScore({ regNo: req.body.regNo, marks: totalMarks, name: req.body.name,mobileNo:req.body.mobileNo,email:req.body.email })
-
+                    let newUser = userScore({name: req.body.name,email:req.body.email,marks:totalMarks,maxMarks: result.maxMarks })
                     // for first entry
-                    if (result1.usersScores == null) {
+
+                    if (result1.usersScores.length == 0) {
 
                         result1.usersScores = [newUser];
+                        console.log(result1)
+                        result1.save()
+                            .then(() => res.send("result saved "))
+                            .catch((err) => next(err))
 
                     }
-                    else result1.usersScores.push(newUser)
-                    console.log(result1)
-                    result1.save()
-                        .then(() => res.send("result1 saved "))
-                        .catch((err) => next(err))
+                    else{
+
+                        f=1
+
+                        for (let i = 0; i < result1.usersScores.length; i++) {
+                            
+                            if(result1.usersScores[i].email==newUser.email){
+                                f=0
+                                break
+                            }
+                            
+                        }
+
+                        if(f){
+
+                            result1.usersScores.push(newUser)
+                            console.log(result1)
+                            result1.save()
+                                .then(() => res.send("result saved "))
+                                .catch((err) => next(err))
+
+                        }
+                        else{
+                            next("User has already given the test")
+                        }
+
+                    } 
+
                 }
 
             })
@@ -86,4 +115,38 @@ function submitTest(req, res, next) {
     })
 }
 
-module.exports = [takeTest, submitTest]
+function viewResult(req, res, next) {
+    if (req.body.testId && req.body.studentEmail) {
+
+        orgTests.findOne({ testId: req.body.testId}, (err, result) => {
+            if (err) next(err)
+            else if (result == null) {
+                next("No such test exists (source: Org)")
+            }
+            else{
+
+                f=0
+
+                for (let i = 0; i < result.usersScores.length; i++) {
+                    
+                    if(result.usersScores[i].email== req.body.studentEmail){
+
+                        res.send(result.usersScores[i])
+                        f=1
+                        break
+                    }
+                }
+
+                if(!f){
+                    next('No such user exists')
+                }
+
+            }
+        })
+    }
+    else next("Test id or student id is not present")
+}
+
+
+
+module.exports = [takeTest, submitTest , viewResult]

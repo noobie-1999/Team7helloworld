@@ -5,6 +5,7 @@ const userScoreSchema = new Schema({
     name: String,
     email: String,
     marks: Number,
+    maxMarks: Number
 })
 
 const orgTestsSchema = new Schema({
@@ -16,7 +17,6 @@ const orgTestsSchema = new Schema({
         type:String,
         required:true
     },
-    start: Boolean,
     usersScores: [userScoreSchema]
 })
 

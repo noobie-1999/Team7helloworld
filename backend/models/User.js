@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const userTestScoreSchema = new Schema({
-  testId: String,
-  score: Number,
-  attempted: Boolean
-})
+// const userTestScoreSchema = new Schema({
+//   testId: String,
+//   totalMarks: Number,
+//   maxMarks: Number
+// })
 
 // Create User Schema
 const UserSchema = new Schema({
@@ -21,13 +21,13 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true
-  },
-  score: [userTestScoreSchema]
+  }
+  // score: userTestScoreSchema
 });
 
 const User = mongoose.model("users", UserSchema);
-const UserTestScores = mongoose.model("UserTestScores", userTestScoreSchema);
+// const UserTestScores = mongoose.model("UserTestScores", userTestScoreSchema);
 
 module.exports = {
-  User,UserTestScores
+  User
 }
