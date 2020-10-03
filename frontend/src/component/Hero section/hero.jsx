@@ -41,10 +41,18 @@ class Hero extends Component {
                       <div className="btn-wrapper mt-4">
                         <Link to="/login">
                           <Button
-                            className="btn-icon mb-3 mb-sm-0"
+                            className="btn-icon mb-3 mb-sm-0 mx-2"
                             color="primary"
                           >
-                            <span className="btn-inner--text">Try it!</span>
+                            <span className="btn-inner--text">For Students</span>
+                          </Button>
+                        </Link>
+                        <Link to="/loginTeacher">
+                          <Button
+                            className="btn-icon mb-3 mb-sm-0 mx-2"
+                            color="primary"
+                          >
+                            <span className="btn-inner--text">For Teachers</span>
                           </Button>
                         </Link>
                       </div>

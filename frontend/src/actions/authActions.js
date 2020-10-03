@@ -1,11 +1,12 @@
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import setToken from '../utils/setToken'
-import { SET_USER, GET_ERRORS } from './types'
+import { SET_USER, GET_ERRORS, SET_TEACHER } from './types'
+import { backendURL } from '../utils/backURL'
 
 export const register = (userData, history) => dispatch => {
     axios
-        .post(`${process.env.REACT_APP_BACKEND_URL}/api/register`, userData)
+        .post(`${backendURL}/users/register`, userData)
         .then(res => history.push('/'))
         .catch(err => {
             dispatch({
@@ -17,7 +18,7 @@ export const register = (userData, history) => dispatch => {
 
 export const login = userData => dispatch => {
     axios
-        .post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, userData)
+        .post(`${backendURL}/users/login`, userData)
         .then(res => {
             const { token } = res.data;
             localStorage.setItem('jwtToken', token);
@@ -32,10 +33,45 @@ export const login = userData => dispatch => {
             })
         })
 }
+export const registerTeacher = (userData, history) => dispatch => {
+    axios
+        .post(`${backendURL}/orgs/register`, userData)
+        .then(res => history.push('/'))
+        .catch(err => {
+            dispatch({
+                type: GET_ERRORS,
+                payload: err.response.data
+            })
+        })
+};
+export const loginTeacher = userData => dispatch => {
+    axios
+        .post(`${backendURL}/orgs/login`, userData)
+        .then(res => {
+            const { token } = res.data;
+            localStorage.setItem('jwtToken', token);
+            setToken(token);
+            const decode = jwt_decode(token);
+            dispatch(setTeacher(decode));
+        })
+        .catch(err => {
+            dispatch({
+                type: GET_ERRORS,
+                payload: err.response.data
+            })
+        })
+}
+
 
 export const setUser = decode => {
     return {
         type: SET_USER,
+        payload: decode
+    }
+}
+export const setTeacher = decode => {
+    return {
+        type: SET_TEACHER,
         payload: decode
     }
 }

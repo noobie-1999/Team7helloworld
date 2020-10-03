@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { InputGroup, InputGroupAddon, Input, FormGroup, InputGroupText, Button } from 'reactstrap'
 import { connect } from 'react-redux'
 import PropTypes from "prop-types";
-import { login } from '../actions/authActions'
-class Login extends Component {
+import { loginTeacher } from '../actions/authActions'
+class LoginTeacher extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -23,7 +23,7 @@ class Login extends Component {
       email: this.state.email,
       password: this.state.password
     }
-    this.props.login(userData);
+    this.props.loginTeacher(userData);
   }
   componentDidMount() {
     window.scrollTo(0, 0);
@@ -130,7 +130,7 @@ class Login extends Component {
               <hr style={{ backgroundColor: 'grey', width: '100%' }} />
               <div className="sigun-up-text">
                 <span>Don't have an account?</span><br /><br />
-                <Link to='/register'>
+                <Link to='/registerTeacher'>
 
                   <span>Sign up</span>
                 </Link>
@@ -154,11 +154,11 @@ class Login extends Component {
             </div>
           </div>
         </div>
-  </>
+      </>
     );
   }
 }
-Login.propTypes = {
+LoginTeacher.propTypes = {
   login: PropTypes.func.isRequired,
   auth: PropTypes.object.isRequired,
   errors: PropTypes.object.isRequired
@@ -169,6 +169,6 @@ const mapStateToProps = state => ({
 })
 export default connect(
   mapStateToProps,
-  { login }
-)(Login);
+  { loginTeacher }
+)(LoginTeacher);
 

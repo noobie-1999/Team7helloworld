@@ -3,13 +3,31 @@ import Navbar1 from "./navbar";
 import Footer from "./footer";
 import { Col, Container, Row } from 'reactstrap'
 import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import axios from "axios";
+import { backendURL } from '../utils/backURL'
 
 class Result extends Component {
+    state = {
+        percentage: 0
+    }
+    getResults() {
+        axios
+            .post(`${backendURL}/test/user/viewResult`, {
+                "testID": this.props.testID,
+                "token": localStorage.getItem('jwtToken'),
+                'studentEmail': this.props.email
+            })
+            .then((res) => {
+                this.setState(
+                    { percentage: (res.data.marks / res.data.maxMarks) * 100 }
+                )
+            })
+    }
     componentDidMount() {
         window.scrollTo(0, 0)
     }
     render() {
-        const percentage = 66;
+        const percentage = this.state.percentage
 
         return (
             <>
