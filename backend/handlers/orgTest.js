@@ -82,7 +82,7 @@ function addTest(req, res, next) {
 
                 var OrgTest = new OrgTests({
                     testId: test._id,
-                    teacherId: req.params.teacherId,
+                    teacherId: req.body.teacherId,
                     userScores: []
                 })
 

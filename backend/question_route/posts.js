@@ -14,7 +14,7 @@ router.route("/users/submitTest").post(userVerify, submitTest)
 router.route('/users/viewResult').post(userVerify,  viewResult);
 
 
-router.route("/orgs/addTest/:teacherId").post(orgVerify,addTest)
+router.route("/orgs/addTest").post(orgVerify,addTest)
 router.route("/orgs/checkResult").post(orgVerify,checkResult)
 router.route("/orgs/questions/:_id").post(orgVerify,viewQuestions)
 router.route("/orgs/addQuestions").post(orgVerify,addQuestion)
