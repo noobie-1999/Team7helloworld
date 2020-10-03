@@ -7,6 +7,11 @@ const users = require('./routes/api/users');
 const orgs = require('./routes/api/orgs');
 
 const app = express()
+var cors = require('cors')
+ 
+app.use(cors())
+
+
 
 app.use(
     bodyParser.urlencoded({
